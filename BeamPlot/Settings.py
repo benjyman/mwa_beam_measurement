@@ -4,6 +4,8 @@
 
 from subprocess          import Popen, PIPE
 
+base_dir='/data/code/git/mwa_beam_measurement'
+
 # Print formatting
 lb = "\n"+"*"*70+'\n'
 
@@ -15,9 +17,9 @@ fault =  {1                : "TLE: %s\nin %s does not belong to satellite",
           5                : "Ops: Undefined operation"}
           
 # File locations
-floc =   {'satdata'        : '/data/code/git/ben-astronomy/beam/BeamPlot/Data/Sat_Data.csv',
-          'TLE'            : '/data/code/git/ben-astronomy/beam/BeamPlot/TLE',
-          'TLEpath'        : '/data/code/git/ben-astronomy/beam/BeamPlot/TLE/%s.txt',
+floc =   {'satdata'        : base_dir+'/BeamPlot/Data/Sat_Data.csv',
+          'TLE'            : base_dir+'/BeamPlot/TLE',
+          'TLEpath'        : base_dir+'/BeamPlot/TLE/%s.txt',
           'Nov2015'        : '/data/beam/Oct_16/Obs/Nov2015/satpasses.txt'}
           
 # Read from file
@@ -28,8 +30,8 @@ read =   {'head'           : lambda f: Popen(['head', '-1', f],
           
 # SpaceTrack Settings
 STrack = {'login'          : ('j.rasti@student.unimelb.edu.au','12monkeysunimelb'),
-          'cookies'        : '/data/code/git/ben-astronomy/beam/BeamPlot/Data/TLEcookies.txt',
-          'dload'          : '/data/code/git/ben-astronomy/beam/BeamPlot/Data/TLEdownload.txt',
+          'cookies'        : base_dir+'/BeamPlot/Data/TLEcookies.txt',
+          'dload'          : base_dir+'/BeamPlot/Data/TLEdownload.txt',
           'newTLE'         : 1420074000,
           'chunk'          : 1000*86400,
           'safety'         : 3*86400,
