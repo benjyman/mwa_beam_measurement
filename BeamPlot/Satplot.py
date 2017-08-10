@@ -1,0 +1,144 @@
+
+##########################################################
+################  SATELLITE PLOTTING #####################
+##########################################################
+
+import os
+print os.getcwd()
+
+import matplotlib.pyplot as plt, numpy as np
+from Python.Settings  import lb, pltopt, obs_range, read
+from Python.TimeMethods     import tm
+from glob import glob
+from Python.Satpass import Sateph
+
+class Satplot(object):
+    
+    def __init__(self, passlist):
+        self.passlist = passlist
+
+    def plotpass(self, ax, mode, sat, data):
+        """Plots passes n in nlist to axes ax with style m, from passes in ephemeris(),
+        populating if nlist not given, with azimuth plot data adjusted for 0-360d jump."""
+        t = [float(i[0]) for i in data]
+        alt = [float(i[1]) for i in data]
+        azi = [float(i[2]) for i in data]
+
+        label, color, ls = (pltopt[par](sat) for par in ['label','colour','ls'])
+        jumps = lambda j: abs(azi[j]-azi[j-1]) > np.deg2rad(pltopt['azigap'])
+        fixed = lambda a: np.insert(a, filter(jumps,range(1,len(azi))), np.nan)
+        xmode = {'alt':t, 'azi':fixed(t), 'polar':azi}
+        ymode = {'alt':alt, 'azi':fixed(azi), 'polar':np.deg2rad(90)-alt}      
+        for a,m in zip(list(ax),list(mode)):
+            a.plot(xmode[m], np.rad2deg(ymode[m]), label=label , ls=ls, color=color)
+
+    def setplot(self, ax, mode, tmin, tmax):
+        for a,m in zip(list(ax),list(mode)):
+            if m=='polar':
+                a.set_rmax(90)
+                a.set_theta_zero_location('N')
+                a.set_theta_direction(-1)
+                a.set_xticklabels([45*i for i in range(9)],size=10)
+                a.set_yticklabels(map(str, range(80, -10, -10)), size=10)
+            else:
+                a.axis([tmin.utc,tmax.utc,0,90 if m=='alt' else 360])
+
+    def labelsort(self, ax, sats):
+        handles, labels = ax.get_legend_handles_labels()
+        mhandles, mlabels = [], []
+        skey = dict(zip([i.desig for i in sats], range(len(sats))))
+        for h,l in sorted(zip(handles, labels), key=lambda x: skey[x[1]]):
+            if l not in mlabels:
+                mhandles.append(h), mlabels.append(l)
+        return mhandles, mlabels
+
+    def ephemref(self, tmin, tmax, spath=pltopt['ephemref'], timestamps=None, show=False):
+        """Produce a figure combining plots of alt/azi vs time plus polar representation"""
+        
+        f, ax = plt.subplots(3, figsize=(16,10))
+        plt.subplots_adjust(hspace=0.25, left=.06, right=.96)
+        ax[0]=plt.subplot2grid((12,5), (0,0), rowspan=6, colspan=3)
+        ax[1]=plt.subplot2grid((12,5), (6,0), rowspan=6, colspan=3)
+        ax[2]=plt.subplot2grid((12,5), (1,3), rowspan=10, colspan=2, polar=True)
+        ptype = ['alt','azi','polar']
+        
+        tmin, tmax = tm(tmin), tm(tmax)          
+        plist = self.passlist  
+        
+        valid_passes = [p for p in range(len(plist)) if (plist[p].rise<tmax and plist[p].fall>tmin)]
+                
+        for i in valid_passes:
+	  if not timestamps:
+            data = [line for line in open('./Obs/Nov2015/%s/%s/sat/%d.txt'%('rf0','YY',i))]
+            data = [d.strip().split(',') for d in data]
+            data = [d for d in data if tm(d[0])>=tmin and tm(d[0])<=tmax]
+          else:
+	    ss = Sateph()
+	    data = ss.ephemeris(plist[i], timestamps)
+          self.plotpass(ax, ptype, plist[i].sat, data)
+          
+        sats = [plist[i].sat for i in valid_passes]
+            
+        self.setplot(ax, ptype, tmin, tmax)#tm(0), tm(tmax-tmin))
+        f.legend(*self.labelsort(ax[2], sats), loc="lower right", handlelength=2, ncol=2)#fontsize="small"##errors##
+        ax[0].set_title("Angular Position versus Time", y=1.05)
+        ax[1].set_xlabel("Time min (epoch: %sUTC)"%tmin)
+        ax[2].set_title("Polar Representation", y=1.1)
+        plt.setp(ax[0].get_xticklabels(), visible=False)
+        #plt.savefig('Johnathon_visibilities.png')
+        savepath = '%s/SatvsTime_'%spath + ('%s_%s.svg'%(tmin,tmax)).replace('/','').replace(' ','-')
+        plt.savefig(savepath)
+        if show:
+            plt.show()
+        plt.close()
+        #return savepath
+        
+    def intensity_plot(self, tmin, tmax, spath='Intensities', show=False, timestamps=[]):
+        
+        f, ax = plt.subplots(2, figsize=(16,10))
+        plt.subplots_adjust(hspace=0.25, left=.06, right=.96)
+        ax[0]=plt.subplot2grid((12,5), (0,0), rowspan=6, colspan=6)
+        ax[1]=plt.subplot2grid((12,5), (6,0), rowspan=6, colspan=6)
+        
+        tmin, tmax = tm(tmin), tm(tmax)          
+        plist = self.passlist  
+        
+        valid_passes = [p for p in range(len(plist)) if (plist[p].rise<tmax and plist[p].fall>tmin)]
+        
+        for i in valid_passes:
+	  if not timestamps:
+            data = [line for line in open('./Obs/Nov2015/%s/%s/sat/%d.txt'%('rf0','YY',i))]
+            data = [d.strip().split(',') for d in data]
+            data = [d for d in data if tm(d[0])>=tmin and tm(d[0])<=tmax]
+            if not data:
+	      print 'No passdata - %s'%tmin
+              plt.close()
+	      return
+          else:
+	    ss = Sateph()
+	    data = ss.ephemeris(plist[i], timestamps)
+          self.plotpass([ax[0]], ['alt'], plist[i].sat, data)
+          
+        sats = [plist[i].sat for i in valid_passes]
+        
+        timestamps = [line.strip() for line in open('./Obs/Nov2015/rf0/YY/stamps.txt')]
+        timestamps = [tm(t).utc if (tm(t)>tmin and tm(t)<tmax) else None for t in timestamps]
+        stamps = [t for t in timestamps if t]
+        
+        for chan in range(1,113):
+	  intensities = []
+	  with open('./Obs/Nov2015/rf0/YY/chan/%d.txt'%chan) as f:
+	    for t in timestamps:
+	      if t:
+		intensities.append(float(f.readline().strip()))
+              else:
+		f.readline()
+          print len(stamps), len(intensities)
+	  ax[1].plot(stamps, intensities)
+	plt.show()
+	
+	      
+	  
+
+
+###END###

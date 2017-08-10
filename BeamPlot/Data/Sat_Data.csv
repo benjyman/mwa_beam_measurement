@@ -1,0 +1,71 @@
+ID,Designation,Class,Operator,Status,Name,Launch,Frequency,Notes
+21576,OC-X,OC-X,Orbcomm,Inactive,Orbcomm-X,17/07/1991,,Capability Demonstration Satellite; aka Datacomm-X; early loss of communication
+22489,OC-CDS1,OC-S,Orbcomm,Inactive,Orbcomm CDS-1,09/02/1993,,Capability Demonstration Satellite; aka OXP; no longer operational
+22639,OC-CDS2,OC-S,Orbcomm,Inactive,Orbcomm CDS-2,25/04/1993,,Capability Demonstration Satellite; aka VSUME; no longer operational
+23545,OC-F1,OC-F,Orbcomm,Inactive,Orbcomm FM1,03/04/1995,,First generation (Orbcomm-OG1); no longer operational
+23546,OC-F2,OC-F,Orbcomm,Inactive,Orbcomm FM2,03/04/1995,,First generation (Orbcomm-OG1); no longer operational
+25158,OC-G1,OC-G,Orbcomm,Inactive,Orbcomm FM3,10/02/1998,,First generation (Orbcomm-OG1); no longer operational
+25159,OC-G2,OC-G,Orbcomm,Active,Orbcomm FM4,10/02/1998,137.6875 137.6780,First generation (Orbcomm-OG1)
+25117,OC-A1,OC-A,Orbcomm,Active,Orbcomm FM5,23/12/1997,137.7175,First generation (Orbcomm-OG1)
+25118,OC-A2,OC-A,Orbcomm,Active,Orbcomm FM6,23/12/1997,137.2250 137.7175,First generation (Orbcomm-OG1)
+25119,OC-A3,OC-A,Orbcomm,Active,Orbcomm FM7,23/12/1997,137.4350 137.6625,First generation (Orbcomm-OG1)
+25112,OC-A4,OC-A,Orbcomm,Active,Orbcomm FM8,23/12/1997,137.4600 137.6625,First generation (Orbcomm-OG1)
+25116,OC-A5,OC-A,Orbcomm,Active,Orbcomm FM9,23/12/1997,137.3125 137.6875 137.7175,First generation (Orbcomm-OG1)
+25113,OC-A6,OC-A,Orbcomm,Active,Orbcomm FM10,23/12/1997,137.7175 137.7375,First generation (Orbcomm-OG1)
+25114,OC-A7,OC-A,Orbcomm,Active,Orbcomm FM11,23/12/1997,137.7175 137.8000,First generation (Orbcomm-OG1)
+25115,OC-A8,OC-A,Orbcomm,Active,Orbcomm FM12,23/12/1997,137.2875 137.6625,First generation (Orbcomm-OG1)
+25420,OC-B1,OC-B,Orbcomm,Active,Orbcomm FM13,02/08/1998,137.8,First generation (Orbcomm-OG1)
+25419,OC-B2,OC-B,Orbcomm,Active,Orbcomm FM14,02/08/1998,137.7375,First generation (Orbcomm-OG1)
+25418,OC-B3,OC-B,Orbcomm,Active,Orbcomm FM15,02/08/1998,137.6625,First generation (Orbcomm-OG1)
+25417,OC-B4,OC-B,Orbcomm,Active,Orbcomm FM16,02/08/1998,137.6625,First generation (Orbcomm-OG1)
+25413,OC-B5,OC-B,Orbcomm,Inactive,Orbcomm FM17,02/08/1998,,First generation (Orbcomm-OG1); no longer operational
+25414,OC-B6,OC-B,Orbcomm,Active,Orbcomm FM18,02/08/1998,137.8,First generation (Orbcomm-OG1)
+25415,OC-B7,OC-B,Orbcomm,Active,Orbcomm FM19,02/08/1998,137.7375,First generation (Orbcomm-OG1)
+25416,OC-B8,OC-B,Orbcomm,Active,Orbcomm FM20,02/08/1998,137.6625,First generation (Orbcomm-OG1)
+25475,OC-C1,OC-C,Orbcomm,Active,Orbcomm FM21,23/09/1998,137.2250 137.2500,First generation (Orbcomm-OG1)
+25476,OC-C2,OC-C,Orbcomm,Inactive,Orbcomm FM22,23/09/1998,,First generation (Orbcomm-OG1); no longer operational
+25477,OC-C3,OC-C,Orbcomm,Active,Orbcomm FM23,23/09/1998,137.2250 137.2500,First generation (Orbcomm-OG1)
+25478,OC-C4,OC-C,Orbcomm,Inactive,Orbcomm FM24,23/09/1998,,First generation (Orbcomm-OG1); no longer operational
+25479,OC-C5,OC-C,Orbcomm,Inactive,Orbcomm FM25,23/09/1998,,First generation (Orbcomm-OG1); no longer operational
+25480,OC-C6,OC-C,Orbcomm,Inactive,Orbcomm FM26,23/09/1998,,First generation (Orbcomm-OG1); no longer operational
+25481,OC-C7,OC-C,Orbcomm,Active,Orbcomm FM27,23/09/1998,137.2250 137.2500,First generation (Orbcomm-OG1)
+25482,OC-C8,OC-C,Orbcomm,Inactive,Orbcomm FM28,23/09/1998,,First generation (Orbcomm-OG1); no longer operational
+33062,OC-D1,OC-D,Orbcomm,Inactive,Orbcomm FM29,19/06/2008,,Capability Demonstration Satellite; rebuilt and lost in later QL launch
+25980,OC-D2,OC-D,Orbcomm,Active,Orbcomm FM30,04/12/1999,,First generation (Orbcomm-OG1)
+25981,OC-D3,OC-D,Orbcomm,Active,Orbcomm FM31,04/12/1999,,First generation (Orbcomm-OG1)
+25982,OC-D4,OC-D,Orbcomm,Active,Orbcomm FM32,04/12/1999,,First generation (Orbcomm-OG1)
+25983,OC-D5,OC-D,Orbcomm,Inactive,Orbcomm FM33,04/12/1999,,First generation (Orbcomm-OG1); listed partially active
+25986,OC-D6,OC-D,Orbcomm,Active,Orbcomm FM34,04/12/1999,,First generation (Orbcomm-OG1)
+25985,OC-D7,OC-D,Orbcomm,Active,Orbcomm FM35,04/12/1999,,First generation (Orbcomm-OG1)
+25984,OC-D8,OC-D,Orbcomm,Active,Orbcomm FM36,04/12/1999,,First generation (Orbcomm-OG1)
+33064,OC-QL1,OC-Q,Orbcomm,Inactive,Orbcomm FM37,19/06/2008,,Orbcomm Quick Launch; launch loss
+33060,OC-QL2,OC-Q,Orbcomm,Inactive,Orbcomm FM38,19/06/2008,,Orbcomm Quick Launch; launch loss
+33063,OC-QL3,OC-Q,Orbcomm,Inactive,Orbcomm FM39,19/06/2008,,Orbcomm Quick Launch; launch loss
+33065,OC-QL4,OC-Q,Orbcomm,Inactive,Orbcomm FM40,19/06/2008,,Orbcomm Quick Launch; launch loss
+33061,OC-QL5,OC-Q,Orbcomm,Inactive,Orbcomm FM41,19/06/2008,,Orbcomm Quick Launch; launch loss
+37840,OC-V1,OC-V,Orbcomm,Inactive,Orbcomm FM42,12/10/2011,,VesselSat; no longer operational
+38047,OC-V2,OC-V,Orbcomm,Inactive,Orbcomm FM43,09/01/2012,,VesselSat; no longer operational
+38847,OC-1H1,OC-S,Orbcomm,Inactive,Orbcomm OG2,08/10/2012,,Capability Demonstration Satellite; aka FM101 launch loss
+40091,OC-3K3,OC-E,Orbcomm,Active,Orbcomm FM103,14/07/2014,137.2500 137.3125,Second generation (Orbcomm-OG2) 
+40090,OC-4K4,OC-E,Orbcomm,Active,Orbcomm FM104,14/07/2014,137.2500 137.3125,Second generation (Orbcomm-OG2) 
+41181,OC-5T3,OC-F,Orbcomm,Active,Orbcomm FM105,22/12/2015,,Second generation (Orbcomm-OG2) 
+40088,OC-6K6,OC-E,Orbcomm,Active,Orbcomm FM106,14/07/2014,137.2500 137.3125,Second generation (Orbcomm-OG2) 
+40087,OC-7K7,OC-E,Orbcomm,Active,Orbcomm FM107,14/07/2014,137.2500 137.3125,Second generation (Orbcomm-OG2) 
+41187,OC-8R2,OC-F,Orbcomm,Active,Orbcomm FM108,22/12/2015,,Second generation (Orbcomm-OG2) 
+40086,OC-9K9,OC-E,Orbcomm,Active,Orbcomm FM109,14/07/2014,137.2500 137.3125,Second generation (Orbcomm-OG2) 
+41182,OC-10T2,OC-F,Orbcomm,Active,Orbcomm FM110,22/12/2015,,Second generation (Orbcomm-OG2) 
+40089,OC-11L1,OC-E,Orbcomm,Inactive,Orbcomm FM111,14/07/2014,137.2500 137.3125,Second generation (Orbcomm-OG2); communications lost mid-2015
+41184,OC-12S3,OC-F,Orbcomm,Active,Orbcomm FM112,22/12/2015,,Second generation (Orbcomm-OG2) 
+41185,OC-13S2,OC-F,Orbcomm,Active,Orbcomm FM113,22/12/2015,,Second generation (Orbcomm-OG2) 
+41179,OC-14T4,OC-F,Orbcomm,Active,Orbcomm FM114,22/12/2015,,Second generation (Orbcomm-OG2) 
+41186,OC-15R3,OC-F,Orbcomm,Active,Orbcomm FM115,22/12/2015,,Second generation (Orbcomm-OG2) 
+41189,OC-16S1,OC-F,Orbcomm,Active,Orbcomm FM116,22/12/2015,,Second generation (Orbcomm-OG2) 
+41188,OC-17R1,OC-F,Orbcomm,Active,Orbcomm FM117,22/12/2015,,Second generation (Orbcomm-OG2) 
+41183,OC-18T1,OC-F,Orbcomm,Active,Orbcomm FM118,22/12/2015,,Second generation (Orbcomm-OG2) 
+41180,OC-19S4,OC-F,Orbcomm,Active,Orbcomm FM119,22/12/2015,,Second generation (Orbcomm-OG2) 
+25338,NOAA-15,NOAA,NOAA,Active,NOAA 15,13/05/1998,137.3500 137.6200,National Oceanic and Atmospheric Administration (USA) weather satellite; listed as backup
+28654,NOAA-18,NOAA,NOAA,Active,NOAA 18,20/05/2005,137.3500 137.9125,National Oceanic and Atmospheric Administration (USA) weather satellite; listed as backup
+33591,NOAA-19,NOAA,NOAA,Active,NOAA 19,06/02/2009,137.1000 137.7700,National Oceanic and Atmospheric Administration (USA) weather satellite; listed as backup
+29499,METOP-A,METOP,ESA,Active,METOP-A,19/10/2006,137.1000 137.9125,European Space Agency (EUMETSAT) weather satellite
+38771,METOP-B,METOP,ESA,Active,METOP-B,17/09/2012,137.1000 137.9125,European Space Agency (EUMETSAT) weather satellite
+40069,METEOR,METEOR,Russia,Active,METEOR-M 2,08/07/2014,137.1000 137.9000 137,Russian weather satellite; Research Center for Earth Operative Monitoring

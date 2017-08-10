@@ -1,0 +1,144 @@
+#############################################################
+###################  SATELLITE PASSES  ######################
+#############################################################
+
+import csv, ephem, numpy as np
+from collections        import namedtuple
+from Python.TLE         import TLE_config
+from Python.Settings    import lb, floc, req_base, exc_base, coords
+from Python.TimeMethods import tm
+
+# Create immutable object containers (call as tuple.par)
+Satellite = namedtuple('Satellite', 'ID desig cls op status')
+Pass = namedtuple('Pass', 'sat rise fall TLE')
+
+class Sateph(object):
+    # Calculate passes and ephemeris for sats in satdata file (refined by inclusion/exclusion conditions)
+    
+    def __init__(self, require=req_base, exclude=exc_base, pos=coords['MWA'], show=True):
+       
+        with open(floc['satdata']) as csvfile:                          # Load satinfo from csv
+            csvfile.readline()                                          # Dump header line in csv
+            csvdata = csv.reader(csvfile)                               # Parse csv into nrows x lists
+            sats = [Satellite(*row[:5]) for row in csvdata]             # Parse first six cols each row
+            
+        for field,req in require.items():                               # Remove sats (inclusion)
+            sats = [s for s in sats if getattr(s,field) in req]
+        for field,exc in exclude.items():                               # Remove sats (exclusion)
+            sats = [s for s in sats if getattr(s,field) not in exc]
+
+        self.sats = {sat.ID:sat for sat in sats}                        # Create satellite container
+        self.obs  = ephem.Observer()                                    # Initialise pyEphem observer class
+        self.obs.lat, self.obs.lon, self.obs.elevation = pos            # Set observer coordinates (MWA)
+        #self.obs.temp = 40     
+        
+    def passes(self, tmin, tmax, passfile=floc['Nov2015'], saveas=None, show=True):
+        """Finds rise and set times of all passes falling within bounds
+
+        Note: next_pass returns the following data as a tuple:
+                  0- Rise time,      1- Rise azimuth
+                  2- Max alt time,   3- Max alt
+                  4- Set time,       5- Set azimuth """
+        
+        def satpass(tmin, tmax):
+            
+            def nextpass(u):
+                # Update target for rise/set calculations by updating tle
+                rise, fall = 0, -1
+                while rise>fall:             
+                    self.obs.date = ephem.Date(u)                            # Set obs. date
+                    target = ephem.readtle('TLE0',*tle.mount(u).split(','))  # Set appropriate TLE
+                    passdata = self.obs.next_pass(target)                    # Compute passdata
+
+                    print passdata
+
+                    rise, fall = float(passdata[0]), float(passdata[4])
+                    print passdata[2], passdata[3]
+                    u = tm(u).eph()-ephem.minute
+                return rise, fall                                        # Return rise/set times
+                
+            passes = []                                                      # Create container
+            umin, umax = tm(tmin).eph(), tm(tmax).eph()                      # Convert to Julian dates
+            for sat in self.sats.values():
+                tle = TLE_config(sat, tmax)                                  # Mount TLE database file
+                rise, fall = nextpass(umin)                                  # Find first pass 
+                while rise<umax:
+                    passes.append(Pass(sat,tm(rise),tm(fall),tle.now))       # Add pass info
+                    rise, fall = nextpass(fall+5*ephem.second)               # Find next pass
+            return passes
+
+        #Either calculate data or load from previously calculated data
+        self.passlist = []
+        self.printout1(tmin,tmax,show,passfile)                              # Print satpass range
+        
+        if passfile:
+          with open(passfile) as f:
+            for line in f:
+                dat = line.strip().split(';')
+                self.passlist.append(Pass(self.sats[dat[0]],tm(dat[1]),tm(dat[2]),dat[3]))
+        else:
+            sortkey = lambda x: (x.rise,x.fall)                          # Pass sorting method
+            self.passlist = sorted(satpass(tmin,tmax), key=sortkey)      # Produce passlist
+        
+        self.printout2(self.passlist, self.sats, show)  # Print passes
+        
+        if saveas:
+            with open(saveas,'w+') as f:
+                [f.write('%s;%.2f;%.2f;%s\n'%(p.sat.ID,tm(p.rise).utc,tm(p.fall).utc,p.TLE)) for p in passlist]
+
+        return self.passlist
+    
+    def ephemeris(self, satpass=None, timestamps=None, ephfile=None, saveas=None, quiet=True):
+        """Calculates ephemeris for passes within trange using step size tstep (excluding
+        right bound if tmax-tmin%tstep!=0) to produce a list of numpy arrays in t,alt,azi"""
+        
+        if ephfile:
+	    data = [line.strip().split(',') for line in open(ephfile)]
+	    return [[float(j) for j in i] for i in data]
+	            
+        def compute(u, seek=False):
+            # Keep constant tle for ephemeris calculation over single pass
+            self.obs.date = ephem.Date(u.eph())
+            self.target.compute(self.obs)
+            return [tm(self.obs.date).utc, self.target.alt, self.target.az]
+        
+        # Compute eph for single pass- operates in the form: target.compute(obs)
+        timestamps = [tm(t) for t in timestamps if tm(t)>satpass.rise and tm(t)<satpass.fall]
+        self.target = ephem.readtle('TLE0',*satpass.TLE.split(','))
+        eph = [compute(u) for u in timestamps]
+        if saveas:
+            with open(saveas,'w+') as f:
+                [f.write('%.2f,%f,%f\n'%(e[0],e[1],e[2])) for e in eph]
+        #return np.swapaxes(eph,0,1)
+        return eph
+        
+    def printout1(self, tmin, tmax, show, passfile):
+        #Print satellite pass search bounds
+        if show:
+            if passfile:
+                print 'Retrieving satellite passes from file (truncated at bounds)...'
+            else:
+                print 'Calculating satellite passes (truncated at bounds)...'
+            print 'From: %.1f -> %s\nTo:   %.1f -> %s\n'%(tm(tmin).utc,tm(tmin).eph(),
+                                                          tm(tmax).utc,tm(tmax).eph())
+        return
+
+    def printout2(self, plist, sats, show):
+        #Print number of passes found for each satellite 
+        print ''
+        if show:  # Print pass data
+            tabform = '%-8s%-12s%-24s%-24s'
+            dform   = '%Y/%m/%d %H:%M:%S'
+            print tabform%('Pass:','Sat:','Rise:','Set:')
+            for i,p in zip(range(len(plist)),plist):
+                print ' '+tabform%(i+1, p.sat.desig ,tm(p.rise).cal(dform), tm(p.fall).cal(dform))
+            # Print pass count per satellite
+            nstring = ''.join([i.sat.desig for i in plist])
+            pcount = [(s.desig, nstring.count(s.desig)) for s in sats.values()]
+            print '\nPasscount: %d'%sum(i[1] for i in pcount)
+            for s in range(len(pcount)):
+                print '%s   %-8s: %d  '%('' if s%4 else '\n',pcount[s][0],pcount[s][1]),
+            print '\n' if s%4 else ''
+        return
+
+###END###

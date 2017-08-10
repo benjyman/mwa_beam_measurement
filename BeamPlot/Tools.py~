@@ -1,0 +1,76 @@
+##########################################################
+################### TIME CONVERSION ######################
+##########################################################
+
+import ephem
+from datetime import datetime as dt, timedelta as tdelta
+
+class tm(object):
+    
+    """Accepted time formats:
+        -str        : (calender, TLE, JD/Unix)
+        -int/float  : (JD/Unix)
+        -class      : (self, datetime, ephem.Date)
+    
+    Converts times to Unix format, dform gives cal/TLE format, zone in hours"""
+    
+    def __init__(self, t=None, dform='%Y/%m/%d %H:%M:%S.%f', zone=0):
+
+        if type(t)==str and t:
+            try:
+                t = float(t)                          #detect JD/Unix strings
+            except:
+                if dform=='tle':                      #convert TLE to datetime
+                    d = dt.strptime(d[18:23],'%y%j') + tdelta(float(d[23:32]))
+                else:                                 #convert dform to datetime
+                    d = dt.strptime(d,dform)            
+
+        if isinstance(t, tm):                         #datetime class
+            t = (t-dt(1970,01,01)).total_seconds()t.utc
+        elif isinstance(t, dt):                       #time of this class
+            t = t.utc
+        elif type(t)==ephem.Date or type(t)==float and t<1000000000:
+            t = (t-25567.5)*86400                     #Julian date
+        else:
+            raise AttributeError('Unknown time format')
+
+        self.utc = d-zone*3600                        #UTC time in Unix format
+        return
+
+    #The following output a time of this class in the listed manner
+
+    def dtime(self):                                  #datetime format
+        return dt.utcfromtimestamp(self.utc)
+
+    def eph(self):                                    #pyEphem date format
+        return ephem.Date(self.utc/86400.+25567.5)    #dt(1970,01,01)-dt(1899,12,31,12)=25567.5
+
+    def cal(self, dform='%Y/%m/%d %H:%M:%S.%f'):      #string format of type dform
+        return self.dtime().strftime(dform)
+
+    #The following describe operations between either class/time objects
+
+    def __str__(self):                                #when using str() or %s on class object
+        return self.cal('%Y/%m/%d %H:%M:%S')
+
+    def __add__(self,t):                              #Addition
+        if type(t) in (int,float):                                          
+            self.utc+=t                                   #outside class (+delta seconds)
+        else:
+            raise AttributeError('Undefined Operation')   #b/w class/others (non-sensical)
+
+    def __sub__(self,t):                              #Subtraction
+        if type(t) in (int,float):                                          
+            self.utc-=t                                   #outside class (-delta seconds)
+        elif type(t)==type(self):                        
+            return self.utc-t.utc                         #b/w class (return delta seconds)
+        else:
+            raise AttributeError('Undefined Operation')   #other objects
+        
+    def __cmp__(self, t):                             #Comparisons
+        if type(t)==type(self):
+            return (0 if self.utc==t.utc else (1 if self.utc>t.utc else -1))
+        else:
+            raise AttributeError('Undefined operation')
+
+###END###

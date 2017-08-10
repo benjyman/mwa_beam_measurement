@@ -1,0 +1,28 @@
+     
+def readht(path, line=-1, nchars=0, offset=0, chopnl=True, retnull=''):
+    """Reads from line (head>=0, tail<0) nchars with offset, all \n cut if chopnl,
+    errors or insufficient chars/lines return '' if retnull else error raised"""
+    request, find = ('tail',line) if line<0 else ('head',-1*line+1)
+    p = Popen([request, str(line), path],stdout=PIPE,stderr=PIPE).communicate()
+    out = p[0].strip().split('\n') if chopnl else p[0]
+    if p[1] or len(out)<-1*find or len(out[line])<nchars+offset:
+        if retnull is False:
+           err('Error: '+('%s'%p[1] if p[1] else 'fewer lines/chars than req.'))
+        return retnull
+    return out[line][offset:offset+nchars] if nchars else out[line]
+
+
+def csvparse(path, form=None, req=None, head=True, delim=','):
+    """Generator of header/line dicts (list header if absent.) output as such or
+    as defined by form function if conditions in req function are satisfied"""
+    csv    = (line.strip().split(delim) for line in open(path))
+    head   = csv.next() if head is True else head
+    data   = [d for d in (dict(zip(head,line)) for line in csv) if req is None or req(d)]
+    return data if form is None else (form(d) for d in data)
+
+
+
+def err(description):
+    """Raises attribute error if characteristics are invalid"""
+    print os.getcwd
+    raise AttributeError(description)

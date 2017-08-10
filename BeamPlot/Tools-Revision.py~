@@ -1,0 +1,205 @@
+
+##########################################################
+##################### PYTHON TOOLS #######################
+##########################################################
+
+
+import os, glob, ephem
+from datetime        import datetime as dt, timedelta as tdelta
+from ephem           import Date
+from subprocess      import Popen, PIPE, call
+
+
+class tm(object):
+    """Allows for management of varying date/time formats, d, by storing listed forms as a common GMT Unix time,
+    dform being the format of string date/times ('tle' for converting TLEs, and zone the GMT offset"""
+    
+    def __init__(self, d=None, dform='%Y/%m/%d %H:%M:%S.%f', zone=0, storage='Julian'):
+#############################################      
+#FIX THIS - TOO SLOW ON TIME OBJECT CREATION 
+#CONVERT OBSERVATION TIMESTAMPS TO JULIAN DATES
+#THEN SET TM STORAGE MODE TO JULIAN
+
+#__init(self,......, storage_mode = 'Julian' or 'Unix' or 'Cal' etc.)
+#THEN STORE AS
+#self.storage_mode='Julian'
+#self.t = .....
+
+
+#SET VALUES AS NONE, EG UNIX=0,JULIAN=0 THEN CONVERT ONLY AFTER PROMPTED.
+
+        def set_time(u):
+	    self.storage = storage
+	    if storage=='Unix':
+	      pass
+	    elif storage=='Julian'
+	      pass
+	    #self.t 
+  
+  
+#SECTION FOR UNIX CONVERSION
+        
+        if dform=='tle':                          #convert TLE to datetime
+            d = dt.strptime(d[18:23],'%y%j') + tdelta(float(d[23:32]))
+        
+        if isinstance(d,tm):                      #time already of this class
+            d = d.utc
+        elif isinstance(d,dt):                    #datetime class time
+            d = (d-dt(1970,01,01)).total_seconds()
+        elif type(d)==ephem.Date:                 #pyEphem time
+            d = (d-25567.5)*86400
+        elif d and type(d) is str:                #string date of type dform (reject null string)
+            d = dt.strptime(d,dform)
+        elif type(d)==float or type(d)==int:      #time is already unix time
+            pass
+        else:
+            raise AttributeError('Unknown time format')
+
+        self.utc = d-zone*3600                  #remove utc zone hours giving utc time in unix format
+        return
+#############################################               
+    """The following output a time of this class in the listed manner"""
+    
+    def dtime(self):                              #datetime format
+        return dt.utcfromtimestamp(self.utc)
+    
+    def eph(self):                                #pyEphem date format
+        return Date(self.utc/86400.+25567.5)      #note: dt(1970,01,01)-dt(1899,12,31,12)=25567.5days
+    
+    def cal(self, dform='%Y/%m/%d %H:%M:%S.%f'):  #string format of type dform
+        return self.dtime().strftime(dform)
+    
+    def __str__(self):                            #format returned when using str() or %s on object
+        return self.cal('%Y/%m/%d %H:%M:%S')
+    
+    """The following describe comparisons/operations between class objects / other times / numbers"""
+
+    def __add__(self,t):                          #addition
+        if type(t)==type(self):                    #between two class objects
+            return self.utc+t.utc
+        return tm(self.utc+t)
+    
+    def __sub__(self,t):                          #subtraction
+        if type(t)==type(self):
+            return self.utc-t.utc
+        self.utc=self.utc-t
+        return self
+    
+    def __div__(self,t):                          #division
+        if type(t)!=type(self):
+            return self.utc/t
+        
+    def __cmp__(self, cls):                       #comparison
+        return (0 if self.utc==tm(cls).utc else (1 if self.utc>tm(cls).utc else -1))
+
+
+     
+def readht(path, line=-1, nchars=0, offset=0, chopnl=True, retnull=''):
+    """Reads from line (head>=0, tail<0) nchars with offset, all \n cut if chopnl,
+    errors or insufficient chars/lines return '' if retnull else error raised"""
+    request, find = ('tail',line) if line<0 else ('head',-1*line+1)
+    p = Popen([request, str(line), path],stdout=PIPE,stderr=PIPE).communicate()
+    out = p[0].strip().split('\n') if chopnl else p[0]
+    if p[1] or len(out)<-1*find or len(out[line])<nchars+offset:
+        if retnull is False:
+           err('Error: '+('%s'%p[1] if p[1] else 'fewer lines/chars than req.'))
+        return retnull
+    return out[line][offset:offset+nchars] if nchars else out[line]
+
+
+def csvparse(path, form=None, req=None, head=True, delim=','):
+    """Generator of header/line dicts (list header if absent.) output as such or
+    as defined by form function if conditions in req function are satisfied"""
+    csv    = (line.strip().split(delim) for line in open(path))
+    head   = csv.next() if head is True else head
+    data   = [d for d in (dict(zip(head,line)) for line in csv) if req is None or req(d)]
+    return data if form is None else (form(d) for d in data)
+
+
+
+
+def err(description):
+    """Raises attribute error if characteristics are invalid"""
+    print os.getcwd
+    raise AttributeError(description)
+#######################################################
+"""
+days = [('Tue','24'),('Wed','25'),('Thu','26'),('Fri','27'),('Sat','28')]
+
+def clean(filepath,forcedate=0):
+    newfile=ren(filepath,forcedate)
+    if 'log' in filepath:
+        os.system('cp %s ../Obs/Check/%s'%(filepath,newfile))
+        return
+    i,errors=0,0
+    for line in open(f):
+        i+=1
+        if not line.strip():
+            continue
+        row=line.strip()
+        s=row.split('$Sp')
+        try:
+            t, d = float(s[0]), [ord(s[1][j]) for j in range(len(s[1]))]
+            if len(row) in [127,128] and len(s[1])==112:
+                open('../Obs/Check/%s'%newfile,'a').write('%.2f'%t+s[1]+'\n')
+                continue
+        except (ValueError,TypeError,IndexError):
+            pass
+        print '%d:%s'%(i,line.strip())
+        errors+=1
+    print i,errors
+    return
+
+def ren(name,forcedate):
+        '''TTTRRXX-20151104-136800138200-NOV15.txt'''
+        
+        name=name.split('/')[-1]
+        string=''
+        if 'log' in name:
+            string+='log-'
+        elif not 'RFEdata' in name:
+            return
+        if 'rec' in name:
+            string+='0'+name.split('-')[-1][0:2]
+            string+='YY'+name.split('rec')[1][0:2]+'-'
+        elif 'ref' in name:
+            n=name.rstrip('.txt')[-1]
+            string+='rf'+n+'XX00-'
+        if forcedate:
+            string+=forcedate+'-'
+        else:
+            for u,v in days:
+                if u in name:
+                    string+='201511'+v+'-'
+        string+='01368000138200-NOV15.txt'
+        return string
+
+initialpath='/media/monolith/SSD240/CERBERUS/'
+for f in glob(initialpath + '*'):
+    clean(f,forcedate='')
+
+def chform():
+    for f in glob('./TimeRows/*'):
+	filename=f.rstrip('trows.txt')+'frows.txt'
+	filename=filename.lstrip('./TimeRows/')
+	times=[]
+	g=open(f)
+	for l in g:
+	    times.append(l[:13])
+	g.seek(0)
+	h=open(filename,'a')
+	for t in range(len(times)):
+	    h.write(times[t])
+	    if t!=len(times)-1:
+		h.write(',')
+	    else:
+		h.write('\n')
+	for i in range(112):
+	    lin,chan=len(times),''
+	    g.seek(0)
+	    for l in g:
+		chan+=l[13+i]
+	    h.write(chan+'\n')
+	g.close()
+	h.close()
+"""
