@@ -1,7 +1,7 @@
 import matplotlib.pyplot as plt
 import matplotlib.dates as mdates
 from BeamPlot.Satpass    import Sateph
-from BeamPlot.Settings  import lb, obs_range, obs_range_test#, obs_range_test_rf0xx_01, obs_range_test_rf0xx_02, obs_range_test_rf0xx_03, obs_range_test_rf1xx,obs_range_all_rf1xx,obs_range_056xx_test
+from BeamPlot.Settings  import lb, obs_range, obs_range_test, coords#, obs_range_test_rf0xx_01, obs_range_test_rf0xx_02, obs_range_test_rf0xx_03, obs_range_test_rf1xx,obs_range_all_rf1xx,obs_range_056xx_test
 from BeamPlot.TLE import TLE_config
 from BeamPlot.TimeMethods     import tm
 from BeamPlot.Obstile   import Obstile
@@ -33,11 +33,11 @@ vel_light=299792458.0
 height=0.3
 
 #Define the directory of the raw data
-raw_data_dir='/data/beam/Aug2017_test/data'
-converted_frow_data_dir='./Converted'
+#raw_data_dir='/data/beam/Aug2017_test/data'
+#converted_frow_data_dir='./Converted'
 
 #Set to false if data already converted
-convert_data_to_frows=True
+#convert_data_to_frows=True
 
 #function to find the nearest value in an array and its index
 def find_nearest(array,value):
@@ -84,25 +84,25 @@ def reproject_beam_to_healpix(beam_fits_filename,output_healpix_beam_filename):
 #define the tile name
 #AUT_tile_list=["051YY","052YY","053YY","054YY","055YY","056YY","057YY","058YY","rf0YY","rf1YY"]
 #AUT_tile_list=["051YY","052YY","053YY","054YY"]
-AUT_tile_list=["rf0YY"]
+#AUT_tile_list=["rf0YY"]
 #AUT_tile_list=["rf0XX"]
 #AUT_tile_list=["rf0YY","rf1YY"]
 #AUT_tile_list=["051XX","052XX","053XX","054XX","055XX","056XX","057XX","058XX","rf0XX","rf1XX"]
 #AUT_tile_list=["051XX","052XX","053XX","054XX","055XX","056XX","057XX","058XX"]
 
 #ref_tile_list=["rf0YY","rf1YY"]
-ref_tile_list=["rf1YY","rf0YY"]
+#ref_tile_list=["rf1YY","rf0YY"]
 #ref_tile_list=["rf0XX"]
 #ref_tile_list=["rf0XX","rf1XX"]
 
 #set threshold for signal detection in db (noise level is around -100 to -109
 #AUT_signal_threshold=-85
-AUT_signal_threshold=-50
-ref_signal_threshold=-85
+#AUT_signal_threshold=-50
+#ref_signal_threshold=-85
 #AUT_signal_threshold=-120
 #ref_signal_threshold=-120
 #set the how high a sat must be to be used (in deg above horizon)
-alt_threshold=30
+#alt_threshold=30
 #healpix size
 nside=32
 
@@ -1323,14 +1323,57 @@ output_healpix_beam_filename_YY='healpix_beam_map_YY.fits'
 #obs_start_time=1448429025
 #obs_end_time=1448447953
 ##Jack test data 4 Aug 2017 (start 1501833532?)
-obs_start_time=1501833532
-obs_end_time=1501833542
 
+import sys,os
+from optparse import OptionParser,OptionGroup
+
+usage = 'Usage: plot_beams.py [options]'
+
+parser = OptionParser(usage=usage)
+
+parser.add_option('--generate_pb_map',action='store_true',dest='generate_pb_map',default=True,help='Generate the primary beam map from the RFExplorerdata and save map data [default=%default]')
+parser.add_option('--plot_pb_map',action='store_true',dest='plot_pb_map',default=True,help='Make and save the plots of the beam maps [default=%default]')
+parser.add_option('--obs_start_time',type='string', dest='obs_start_time',default=None,help='Start time in gps seconds of the observations e.g. --obs_start_time="1501833532" [default=%default]')
+parser.add_option('--obs_end_time',type='string', dest='obs_end_time',default=None,help='Start time in gps seconds of the observations e.g. --obs_end_time="1501833542" [default=%default]')
+parser.add_option('--convert_to_frows',action='store_true',dest='convert_to_frows',default=True,help='Convert data in the raw_data_dir to required f-row format [default=%default]')
+parser.add_option('--raw_data_dir',type='string', dest='raw_data_dir',default='./mwa_beam_measurement/test_data',help='Directory where the raw data from the RFExplorers is stored e.g. --raw_data_dir="/data/code/git/mwa_beam_measurement/test_data" [default=%default]')
+parser.add_option('--converted_data_dir',type='string', dest='converted_data_dir',default='./Converted',help='Directory where the data converted to f-row format is stored e.g. --converted_data_dir="./Converted" [default=%default]')
+parser.add_option('--ref_tile_list',type='string', dest='ref_tile_list',default=None,help='list of reference antenna names e.g. --ref_ant_tile_list="rf0XX,rf1XX,rf0YY,rf1YY" [default=%default]')
+parser.add_option('--AUT_tile_list',type='string', dest='AUT_tile_list',default=None,help='list of Antenna Under Test (AUT) names e.g. --AUT_tile_list="050XX,051XX,052YY,053YY" [default=%default]')
+parser.add_option('--ref_signal_threshold',type='string', dest='ref_signal_threshold',default="-85",help='Threshold reference antenna power level for including data in plots in dBm e.g. --ref_signal_threshold="-85" [default=%default]')
+parser.add_option('--AUT_signal_threshold',type='string', dest='AUT_signal_threshold',default="-50",help='Threshold AUT  power level for including data in plots in dBm e.g. --ref_signal_threshold="-50" [default=%default]')
+parser.add_option('--alt_threshold',type='string', dest='alt_threshold',default="30",help='Threshold altitiude for how high a sat must be for inclusion e.g. --alt_threshold="30" [default=%default]')
+
+
+(options, args) = parser.parse_args()
+
+   
+   
+#obs_start_time=1501833532
+#obs_end_time=1501833542
+
+if options.convert_to_frows:
+   convert_data_to_frows=True
+
+raw_data_dir=options.raw_data_dir
+converted_frow_data_dir=options.converted_data_dir
+
+obs_start_time=float(options.obs_start_time)
+obs_end_time=float(options.obs_end_time)
+
+ref_tile_list=options.ref_tile_list.split(',')
+AUT_tile_list=options.AUT_tile_list.split(',')
+ref_signal_threshold=float(options.ref_signal_threshold)
+AUT_signal_threshold=float(options.AUT_signal_threshold)
+
+alt_threshold=float(options.alt_threshold)
 
 for ref_ant in ref_tile_list:
    for AUT in AUT_tile_list:
-      generate_pb_map(AUT,ref_ant,AUT_signal_threshold,ref_signal_threshold)
-      plot_pb_map(AUT,ref_ant)
+      if options.generate_pb_map:
+         generate_pb_map(AUT,ref_ant,AUT_signal_threshold,ref_signal_threshold)
+      if options.plot_pb_map:
+         plot_pb_map(AUT,ref_ant)
 #      plot_1D(AUT,ref_ant)
 #      #plot_chan_histogram(AUT_tile_name,ref_tile_name)
 
@@ -1343,10 +1386,10 @@ for ref_ant in ref_tile_list:
 
 ################simulatey stuff###############
 #observatory='Greenbank'
-observatory='MWA'
-polarisation='YY'
-t_step=0.5
-noise = 1 #noise added to AUT and ref in dBm (due to amplitude stability of 3dBm for RfExplorers)
+#observatory='MWA'
+#polarisation='YY'
+#t_step=0.5
+#noise = 1 #noise added to AUT and ref in dBm (due to amplitude stability of 3dBm for RfExplorers)
 
 #simulate_pb_map(obs_start_time,obs_end_time,t_step,observatory,polarisation,noise)
 #plot_simulated_pb_map(obs_start_time,obs_end_time,t_step,observatory,polarisation)
