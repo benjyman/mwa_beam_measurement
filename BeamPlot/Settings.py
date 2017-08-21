@@ -4,7 +4,7 @@
 
 from subprocess          import Popen, PIPE
 
-base_dir='/data/code/git/mwa_beam_measurement'
+base_dir='/Users/benjaminmckinley/Code/git_Projects/mwa_beam_measurement'
 
 # Print formatting
 lb = "\n"+"*"*70+'\n'

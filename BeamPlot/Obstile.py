@@ -55,13 +55,10 @@ class Obstile(object):
     
     def getdata(self, tmin=None, tmax=None, c=range(1,113)):
         for tile in self.tiles:
-            print self.tiles[tile].f_file
             with open(self.tiles[tile].f_file) as dfile:
                 d = dfile.readline().strip()
                 stamps = [float(d[i:i+13]) for i in range(0,len(d),13)]
-                print stamps
                 ti, tf = self.restrict(stamps, tmin, tmax)
-                print ti,tf
                 chan = [[-1*ord(d)/2. for d in dfile.readline().strip()[ti:tf]]
                         if i in c else dfile.readline()[0:0] for i in range(1,113)]
             self.data[tile] = np.array([stamps[ti:tf]]+chan)
@@ -92,6 +89,8 @@ class Obstile(object):
         
     def rdata(self, tile, tmin=None, tmax=None):
         # Execute restriction on full data set
+        #print "rdata tmin tmax"
+        #print tmin,tmax
         index = self.restrict(self.data[tile][0],tmin,tmax)
         return np.array([d[index[0]:index[1]] for d in self.data[tile]])
 

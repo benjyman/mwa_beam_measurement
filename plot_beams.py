@@ -5,7 +5,7 @@ from BeamPlot.Settings  import lb, obs_range, obs_range_test, coords#, obs_range
 from BeamPlot.TLE import TLE_config
 from BeamPlot.TimeMethods     import tm
 from BeamPlot.Obstile   import Obstile
-from BeamPlot.convert_to_frows import distribute
+from BeamPlot.convert_to_frows_one_file import distribute
 from numpy            import rad2deg
 import numpy as np
 import healpy as hp
@@ -32,6 +32,7 @@ vel_light=299792458.0
 #dipole height m
 height=0.3
 
+bad_chan=86
 #Define the directory of the raw data
 #raw_data_dir='/data/beam/Aug2017_test/data'
 #converted_frow_data_dir='./Converted'
@@ -76,7 +77,7 @@ def reproject_beam_to_healpix(beam_fits_filename,output_healpix_beam_filename):
     fits.writeto(file_name_2D, image_data_2D, image_header,clobber=True)
     print "Using %s" % file_name_2D
     array, footprint = reproject_to_healpix(file_name_2D, 'G', hdu_in=0, order='bilinear', nested=False, nside=32)
-    hp.write_map(output_healpix_beam_filename, array)
+    hp.write_map(output_healpix_beam_filename, array, overwrite=True)
     print "Made healpix image %s" % output_healpix_beam_filename
     
     
@@ -233,26 +234,33 @@ def generate_pb_map(AUT_tile_name_in,ref_tile_name_in,AUT_signal_threshold_in,re
    
    #Convert to frows if not done already
    if (convert_data_to_frows):
+       converted_data_filename_ref="%s_ref_%s.txt" % (ref_tile_name,converted_data_filename_base)
        print 'Looking for files %s/%s*' %(raw_data_dir,ref_tile_name)
        raw_ref_data_file_list=glob('%s/%s*' %(raw_data_dir,ref_tile_name))
-       distribute(raw_ref_data_file_list)             
+       distribute(raw_ref_data_file_list,converted_file_name=converted_data_filename_ref)             
    
    #Get the data for the ref tile
    ref_obs = Obstile([ref_tile_name],data_dir=converted_frow_data_dir)
    ref_obs.getdata()
    ref_dat = ref_obs.rdata(tile=ref_tile_name,tmin=t_min,tmax=t_max)
    
-   print ref_dat
+   #print ref_dat.shape
+   #print t_min
+   #print t_max
    
    if (convert_data_to_frows):
+      converted_data_filename_AUT="%s_AUT_%s.txt" % (AUT_tile_name, converted_data_filename_base)
       raw_AUT_data_file_list=glob('%s/%s*' %(raw_data_dir,AUT_tile_name))
-      distribute(raw_AUT_data_file_list) 
+      distribute(raw_AUT_data_file_list,converted_file_name=converted_data_filename_AUT) 
    #select the AUT and get the data for that tile
    obs = Obstile([AUT_tile_name],data_dir=converted_frow_data_dir)
    obs.getdata()
+   #print "t_min"
+   #print t_min
    AUT_dat = obs.rdata(tile=AUT_tile_name,tmin=t_min,tmax=t_max)
 
-   #print AUT_dat
+
+   #print AUT_dat.shape
 
    data_time_array=np.array(AUT_dat[0])
    ref_time_array=np.array(ref_dat[0])
@@ -263,7 +271,7 @@ def generate_pb_map(AUT_tile_name_in,ref_tile_name_in,AUT_signal_threshold_in,re
    
    
    
-   #print data_time_array
+   #print data_time_array[0]
 
    #make a list of sats
    #sat_info=sateph.sats
@@ -329,6 +337,13 @@ def generate_pb_map(AUT_tile_name_in,ref_tile_name_in,AUT_signal_threshold_in,re
          #powers=[]
          AUT_powers=[AUT_dat[1+chan][index] for chan in range(0,112)]
          ref_powers=[ref_dat[1+chan][ref_timestamp_index] for chan in range(0,112)]
+         #set bad chan(s) to zero
+         AUT_powers[bad_chan]=-110
+         ref_powers[bad_chan]=-110
+         AUT_powers[bad_chan+1]=-110
+         ref_powers[bad_chan+1]=-110
+         AUT_powers[bad_chan-1]=-110
+         ref_powers[bad_chan-1]=-110
          #doing this doesn't work for some reason....
          #ref_powers=[ref_dat[1+chan][index] for chan in range(0,112)]
          #print sats_above_30_list
@@ -336,8 +351,8 @@ def generate_pb_map(AUT_tile_name_in,ref_tile_name_in,AUT_signal_threshold_in,re
             #print timestep
             #print index
             #print timestamp
-            if (sat_above_30=='OC-A1' or sat_above_30=='OC-A2' or sat_above_30=='OC-A3'or sat_above_30=='OC-A4'or sat_above_30=='OC-A5'or sat_above_30=='OC-A7' or sat_above_30=='OC-A6'or sat_above_30=='OC-A8' or sat_above_30=='OC-B1'or sat_above_30=='OC-B2'or sat_above_30=='OC-B4'or sat_above_30=='OC-B7'or sat_above_30=='OC-B6' or sat_above_30=='OC-C3'or sat_above_30=='OC-C1'or sat_above_30=='OC-D2'or sat_above_30=='OC-D3'or sat_above_30=='OC-D6'or sat_above_30=='OC-D7'or sat_above_30=='OC-D8' or sat_above_30=='NOAA-19'or sat_above_30=='NOAA-15'or sat_above_30=='OC-3K3'or sat_above_30=='OC-4K4'or sat_above_30=='OC-6K6' or sat_above_30=='OC-B3'or sat_above_30=='OC-G2'or sat_above_30=='NOAA-18'or sat_above_30=='OC-B8'or sat_above_30=='OC-C7'or sat_above_30=='OC-D4'or sat_above_30=='OC-7K7'or sat_above_30=='OC-9K9'or sat_above_30=='METEOR'):
-               #if (1 == 2):
+            #if (sat_above_30=='OC-A1' or sat_above_30=='OC-A2' or sat_above_30=='OC-A3'or sat_above_30=='OC-A4'or sat_above_30=='OC-A5'or sat_above_30=='OC-A7' or sat_above_30=='OC-A6'or sat_above_30=='OC-A8' or sat_above_30=='OC-B1'or sat_above_30=='OC-B2'or sat_above_30=='OC-B4'or sat_above_30=='OC-B7'or sat_above_30=='OC-B6' or sat_above_30=='OC-C3'or sat_above_30=='OC-C1'or sat_above_30=='OC-D2'or sat_above_30=='OC-D3'or sat_above_30=='OC-D6'or sat_above_30=='OC-D7'or sat_above_30=='OC-D8' or sat_above_30=='NOAA-19'or sat_above_30=='NOAA-15'or sat_above_30=='OC-3K3'or sat_above_30=='OC-4K4'or sat_above_30=='OC-6K6' or sat_above_30=='OC-B3'or sat_above_30=='OC-G2'or sat_above_30=='NOAA-18'or sat_above_30=='OC-B8'or sat_above_30=='OC-C7'or sat_above_30=='OC-D4'or sat_above_30=='OC-7K7'or sat_above_30=='OC-9K9'or sat_above_30=='METEOR'):
+            if (1 == 2):
                channel=chans_dict[sat_above_30]
                AUT_max_power=AUT_powers[channel]
                #AUT_max_power_mW=10.0**(AUT_max_power/20.0)
@@ -475,8 +490,8 @@ def generate_pb_map(AUT_tile_name_in,ref_tile_name_in,AUT_signal_threshold_in,re
    #   rf1XX_tile_map_av=tile_map_av
    
    #hp.gnomview(tile_map_av, coord='C',reso=60,xsize=400, title=map_title, rot=(0,90,0))  
-   hp.write_map(fits_name, AUT_tile_map_dB_av_dipole_corrected,dtype=np.float32)
-   hp.write_map(fits_name_no_dipole_correction,AUT_tile_map_dB_av,dtype=np.float32)
+   hp.write_map(fits_name, AUT_tile_map_dB_av_dipole_corrected,dtype=np.float32, overwrite=True)
+   hp.write_map(fits_name_no_dipole_correction,AUT_tile_map_dB_av,dtype=np.float32, overwrite=True)
    
 def plot_pb_map(AUT_tile_name_in,ref_tile_name_in):
 
@@ -497,12 +512,18 @@ def plot_pb_map(AUT_tile_name_in,ref_tile_name_in):
    #hp.gnomview(AUT_tile_map_av, coord='C',reso=60,xsize=400, title=map_title, rot=(0,90,0))  
    hp.orthview(map=AUT_tile_map_av,coord='E',half_sky=True,xsize=400,title=map_title,rot=(0,90,0))
    figmap = plt.gcf()
+   if os.path.exists(fig_name):
+      cmd = "rm -f %s " % fig_name
+      os.system(cmd)
    figmap.savefig(fig_name,dpi=200)
    plt.clf()
    
    #no dipole correction
    hp.orthview(map=AUT_tile_map_av_no_dipole_correction,coord='C',half_sky=True,xsize=400,title=map_title_no_dipole_correction,rot=(0,90,0))
    figmap = plt.gcf()
+   if os.path.exists(fig_name_no_dipole_correction):
+      cmd = "rm -f %s " % fig_name_no_dipole_correction
+      os.system(cmd)
    figmap.savefig(fig_name_no_dipole_correction,dpi=200)
    plt.clf()
    
@@ -510,7 +531,7 @@ def plot_pb_map(AUT_tile_name_in,ref_tile_name_in):
    #hp.gnomview(tile_map_av, coord='C',reso=60,xsize=400, title=map_title, rot=(0,90,0))  
    #hp.gnomview(tile_map, coord='C',reso=60,xsize=400, title=map_title, rot=(0,90,0))
 
-   #hp.write_map(fits_name, tile_map_av)
+   #hp.write_map(fits_name, tile_map_av, overwrite=True)
        
    #reference_corrected_maps
    #ref_corrected_tile_map_av=tile_map_av-rf0XX_tile_map_av  #minus in log space (dB) is equivalent to division of raw numbers
@@ -904,10 +925,10 @@ def simulate_pb_map(obs_start_time,obs_end_time,t_step,observatory,polarisation,
    
    
    #hp.gnomview(tile_map_av, coord='C',reso=60,xsize=400, title=map_title, rot=(0,90,0))  
-   hp.write_map(fits_name, AUT_tile_map_dB_av_dipole_corrected)
-   hp.write_map(counter_fits_name,AUT_tile_map_data_entries_counter)
-   hp.write_map(dipole_model_name,dipole_model_map_db)
-   hp.write_map(fits_name_no_dipole_correction,AUT_tile_map_dB_av)
+   hp.write_map(fits_name, AUT_tile_map_dB_av_dipole_corrected, overwrite=True)
+   hp.write_map(counter_fits_name,AUT_tile_map_data_entries_counter, overwrite=True)
+   hp.write_map(dipole_model_name,dipole_model_map_db, overwrite=True)
+   hp.write_map(fits_name_no_dipole_correction,AUT_tile_map_dB_av, overwrite=True)
      
 #def plot_ref_corrected_pb_map():
 #
@@ -943,7 +964,6 @@ def simulate_pb_map(obs_start_time,obs_end_time,t_step,observatory,polarisation,
             
             
             
-      
 def plot_1D(AUT_tile_name_in,ref_tile_name_in):
 
    AUT_tile_name=AUT_tile_name_in
@@ -1146,6 +1166,9 @@ def plot_1D_simulated(obs_start_time,obs_end_time,t_step,observatory,polarisatio
       ax1.legend(bbox_to_anchor=(1.4,1), loc='upper right', ncol=1)
       
    ax1.set_title('Orbcomm Satellite Passes. Total:%s' % (total_passes))
+   if os.path.exists(fig_name_alltime):
+      cmd="rm -f %s" % fig_name_alltime
+      os.system(cmd)
    fig1.savefig(fig_name_alltime,dpi=200,bbox_inches='tight',)    
    fig1.clf()
    
@@ -1333,9 +1356,10 @@ parser = OptionParser(usage=usage)
 
 parser.add_option('--generate_pb_map',action='store_true',dest='generate_pb_map',default=True,help='Generate the primary beam map from the RFExplorerdata and save map data [default=%default]')
 parser.add_option('--plot_pb_map',action='store_true',dest='plot_pb_map',default=True,help='Make and save the plots of the beam maps [default=%default]')
+parser.add_option('--plot_1D',action='store_true',dest='plot_1D',default=False,help='Make and save 1D plots of alt/power vs time [default=%default]')
 parser.add_option('--obs_start_time',type='string', dest='obs_start_time',default=None,help='Start time in gps seconds of the observations e.g. --obs_start_time="1501833532" [default=%default]')
 parser.add_option('--obs_end_time',type='string', dest='obs_end_time',default=None,help='Start time in gps seconds of the observations e.g. --obs_end_time="1501833542" [default=%default]')
-parser.add_option('--convert_to_frows',action='store_true',dest='convert_to_frows',default=True,help='Convert data in the raw_data_dir to required f-row format [default=%default]')
+parser.add_option('--convert_to_frows',action='store_true',dest='convert_to_frows',default=False,help='Convert data in the raw_data_dir to required f-row format [default=%default]')
 parser.add_option('--raw_data_dir',type='string', dest='raw_data_dir',default='./mwa_beam_measurement/test_data',help='Directory where the raw data from the RFExplorers is stored e.g. --raw_data_dir="/data/code/git/mwa_beam_measurement/test_data" [default=%default]')
 parser.add_option('--converted_data_dir',type='string', dest='converted_data_dir',default='./Converted',help='Directory where the data converted to f-row format is stored e.g. --converted_data_dir="./Converted" [default=%default]')
 parser.add_option('--ref_tile_list',type='string', dest='ref_tile_list',default=None,help='list of reference antenna names e.g. --ref_ant_tile_list="rf0XX,rf1XX,rf0YY,rf1YY" [default=%default]')
@@ -1343,6 +1367,8 @@ parser.add_option('--AUT_tile_list',type='string', dest='AUT_tile_list',default=
 parser.add_option('--ref_signal_threshold',type='string', dest='ref_signal_threshold',default="-85",help='Threshold reference antenna power level for including data in plots in dBm e.g. --ref_signal_threshold="-85" [default=%default]')
 parser.add_option('--AUT_signal_threshold',type='string', dest='AUT_signal_threshold',default="-50",help='Threshold AUT  power level for including data in plots in dBm e.g. --ref_signal_threshold="-50" [default=%default]')
 parser.add_option('--alt_threshold',type='string', dest='alt_threshold',default="30",help='Threshold altitiude for how high a sat must be for inclusion e.g. --alt_threshold="30" [default=%default]')
+parser.add_option('--converted_data_filename_base',type='string', dest='converted_data_filename_base',default="converted_all",help=' e.g. --converted_data_filename_base="Aug_2017_wed_all_good" [default=%default]')
+parser.add_option('--use_old_TLEs',action='store_true',dest='use_old_TLEs',default=False,help='**Not yet implemented** Do not check for more recent TLEs [default=%default]')
 
 
 (options, args) = parser.parse_args()
@@ -1354,6 +1380,9 @@ parser.add_option('--alt_threshold',type='string', dest='alt_threshold',default=
 
 if options.convert_to_frows:
    convert_data_to_frows=True
+   converted_data_filename_base=options.converted_data_filename_base
+else:
+   convert_data_to_frows=False
 
 raw_data_dir=options.raw_data_dir
 converted_frow_data_dir=options.converted_data_dir
@@ -1374,7 +1403,8 @@ for ref_ant in ref_tile_list:
          generate_pb_map(AUT,ref_ant,AUT_signal_threshold,ref_signal_threshold)
       if options.plot_pb_map:
          plot_pb_map(AUT,ref_ant)
-#      plot_1D(AUT,ref_ant)
+      if (options.plot_1D):
+         plot_1D(AUT,ref_ant)
 #      #plot_chan_histogram(AUT_tile_name,ref_tile_name)
 
 ##obsrange:(1448335711, 1448851982)
