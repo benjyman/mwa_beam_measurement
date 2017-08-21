@@ -147,7 +147,7 @@ useable_sat_list=[]
 #sat_list=['OC-5T3','OC-8R2','OC-10T2','OC-12S3','OC-13S2','OC-14T4','OC-15R3','OC-16S1','OC-17R1','OC-18T1','OC-19S4']
 #all sats
 sat_list=['OC-G2', 'OC-A1', 'OC-A2', 'OC-A3', 'OC-A4', 'OC-A5', 'OC-A6', 'OC-A7', 'OC-A8', 'OC-B1', 'OC-B2', 'OC-B3', 'OC-B4', 'OC-B6', 'OC-B7', 'OC-B8', 'OC-C1', 'OC-C3', 'OC-C7', 'OC-D2', 'OC-D3', 'OC-D4', 'OC-D6', 'OC-D7', 'OC-D8', 'OC-3K3', 'OC-4K4', 'OC-6K6', 'OC-7K7', 'OC-9K9', 'NOAA-15', 'NOAA-18', 'NOAA-19','METEOR','OC-5T3','OC-8R2','OC-10T2','OC-12S3','OC-13S2','OC-14T4','OC-15R3','OC-16S1','OC-17R1','OC-18T1','OC-19S4']
-
+#All sats except those that had no channel allocations in histograms:
 
 
 #sat_list=['OC-G2', 'OC-A1', 'OC-A2', 'OC-A3']
@@ -177,7 +177,9 @@ sat_list=['OC-G2', 'OC-A1', 'OC-A2', 'OC-A3', 'OC-A4', 'OC-A5', 'OC-A6', 'OC-A7'
 #chans_dict={'NOAA-15': 66, 'NOAA-18': 89, 'NOAA-19': 24,'OC-G2':71,'OC-A1':51,'OC-A2':32,'OC-A3':34,'OC-A4':80,'OC-A5':32,'OC-A7':80,'OC-A6':51,'OC-A8':32,'OC-B1':34,'OC-B2':34,'OC-B4':51,'OC-B6':34,'OC-B7':80,'OC-C3':72,'OC-C1':36,'OC-D2':51, 'OC-D3':51,'OC-D6':68,'OC-D7':51,'OC-D8':51,'OC-3K3':36, 'OC-4K4':36, 'OC-6K6':36,'NOAA-19':24,'NOAA-15':24}
 
 #Jarryd's Chan dict:
-chans_dict={'OC-G2':71, 'OC-A1':32, 'OC-A2':32, 'OC-A3':80, 'OC-A4':80, 'OC-A5':32, 'OC-A6':80, 'OC-A7':80, 'OC-A8':32, 'OC-B1':34, 'OC-B2':34, 'OC-B3':34, 'OC-B4':34, 'OC-B6':34, 'OC-B7':34, 'OC-B8':34, 'OC-C1':75, 'OC-C3':73, 'OC-C7':39, 'OC-D2':51, 'OC-D3':51, 'OC-D4':75, 'OC-D6':69, 'OC-D7':51, 'OC-D8':51, 'OC-3K3':36, 'OC-4K4':36, 'OC-6K6':36, 'OC-7K7':36, 'OC-9K9':36, 'NOAA-15':66, 'NOAA-18':89, 'NOAA-19':24,'METEOR':24}
+#chans_dict={'OC-G2':71, 'OC-A1':32, 'OC-A2':32, 'OC-A3':80, 'OC-A4':80, 'OC-A5':32, 'OC-A6':80, 'OC-A7':80, 'OC-A8':32, 'OC-B1':34, 'OC-B2':34, 'OC-B3':34, 'OC-B4':34, 'OC-B6':34, 'OC-B7':34, 'OC-B8':34, 'OC-C1':75, 'OC-C3':73, 'OC-C7':39, 'OC-D2':51, 'OC-D3':51, 'OC-D4':75, 'OC-D6':69, 'OC-D7':51, 'OC-D8':51, 'OC-3K3':36, 'OC-4K4':36, 'OC-6K6':36, 'OC-7K7':36, 'OC-9K9':36, 'NOAA-15':66, 'NOAA-18':89, 'NOAA-19':24,'METEOR':24}
+#Ben chan dict with new sats
+chans_dict={'OC-G2':43, 'OC-A1':np.nan, 'OC-A2':6, 'OC-A3':np.nan, 'OC-A4':np.nan, 'OC-A5':np.nan, 'OC-A6':11, 'OC-A7':41, 'OC-A8':11, 'OC-B1':np.nan, 'OC-B2':51, 'OC-B3':np.nan, 'OC-B4':46, 'OC-B6':6, 'OC-B7':11, 'OC-B8':46, 'OC-C1':46, 'OC-C3':11, 'OC-C7':11, 'OC-D2':25, 'OC-D3':23, 'OC-D4':np.nan, 'OC-D6':np.nan, 'OC-D7':23, 'OC-D8':23, 'OC-3K3':8, 'OC-4K4':8, 'OC-6K6':np.nan, 'OC-7K7':8, 'OC-9K9':8, 'NOAA-15':38, 'NOAA-18':61, 'NOAA-19':23,'METEOR':52,'OC-5T3':61,'OC-8R2':np.nan,'OC-10T2':11,'OC-12S3':41,'OC-13S2':41,'OC-14T4':11,'OC-15R3':25,'OC-16S1':41,'OC-17R1':25,'OC-18T1':11,'OC-19S4':11}
 
 
 #for tile 56xx / rf0xx using rf0xx second set of times:
@@ -357,20 +359,25 @@ def generate_pb_map(AUT_tile_name_in,ref_tile_name_in,AUT_signal_threshold_in,re
             #print index
             #print timestamp
             #if (sat_above_30=='OC-A1' or sat_above_30=='OC-A2' or sat_above_30=='OC-A3'or sat_above_30=='OC-A4'or sat_above_30=='OC-A5'or sat_above_30=='OC-A7' or sat_above_30=='OC-A6'or sat_above_30=='OC-A8' or sat_above_30=='OC-B1'or sat_above_30=='OC-B2'or sat_above_30=='OC-B4'or sat_above_30=='OC-B7'or sat_above_30=='OC-B6' or sat_above_30=='OC-C3'or sat_above_30=='OC-C1'or sat_above_30=='OC-D2'or sat_above_30=='OC-D3'or sat_above_30=='OC-D6'or sat_above_30=='OC-D7'or sat_above_30=='OC-D8' or sat_above_30=='NOAA-19'or sat_above_30=='NOAA-15'or sat_above_30=='OC-3K3'or sat_above_30=='OC-4K4'or sat_above_30=='OC-6K6' or sat_above_30=='OC-B3'or sat_above_30=='OC-G2'or sat_above_30=='NOAA-18'or sat_above_30=='OC-B8'or sat_above_30=='OC-C7'or sat_above_30=='OC-D4'or sat_above_30=='OC-7K7'or sat_above_30=='OC-9K9'or sat_above_30=='METEOR'):
-            if (1 == 2):
+            #if (1 == 2):
+            if (sat_above_30 in sat_list):
                channel=chans_dict[sat_above_30]
+               if np.isnan(channel):
+                  continue
                AUT_max_power=AUT_powers[channel]
                #AUT_max_power_mW=10.0**(AUT_max_power/20.0)
                #AUT_max_power_dB_rel_background=10.0*np.log10(AUT_max_power_mW/background_level_mW)
                AUT_max_power_chan=channel
                ref_max_power=ref_powers[channel]
                ref_max_power_chan=channel
+               print 'Allocated chan for %s is: %s' % (sat_above_30,AUT_max_power_chan)
             else:
-               AUT_max_power=np.max(AUT_powers)
-               AUT_max_power_chan=np.argmax(AUT_powers)
-               ref_max_power=np.max(ref_powers)
-               ref_max_power_chan=np.argmax(ref_powers)
-            print 'Max power chan is: %s' % AUT_max_power_chan
+               continue
+               #AUT_max_power=np.max(AUT_powers)
+               #AUT_max_power_chan=np.argmax(AUT_powers)
+               #ref_max_power=np.max(ref_powers)
+               #ref_max_power_chan=np.argmax(ref_powers)
+               #print 'Max power chan is: %s' % AUT_max_power_chan
             if (AUT_max_power > AUT_signal_threshold and ref_max_power>ref_signal_threshold):  
                #print 'max power:%s in chan:%s ' %  (max_power,max_power_chan)
                #populate the power in the dict of dicts!
@@ -1212,10 +1219,10 @@ def plot_chan_histogram(AUT_tile_name,ref_tile_name):
             plt.title("Histogram of max power chans for sat %s" % sat)
             plt.xlabel("Chan Number")
             plt.ylabel("Frequency")
-            current_fig = plt.gcf()
-            current_fig.savefig(fig_name,dpi=200)
-            plt.clf()
-            #plt.show()
+            #current_fig = plt.gcf()
+            #current_fig.savefig(fig_name,dpi=200)
+            #plt.clf()
+            plt.show()
 
 def compare_pb_maps():
     
