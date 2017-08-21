@@ -50,7 +50,9 @@ coords = {'MWA'            :  ('-26.703319', '116.670815', 377.83),
           
 # Define default requirements for desired satellites
 req_base = {'status':['Active']}        # don't want inactive sats
-exc_base = {'cls':['OC-F']}             # new class launched after obs round 1&2
+#exc_base = {'cls':['OC-F']}             # new class launched after obs round 1&2
+#want these new ones now!
+exc_base = {}
 
 # Options for plotting of satellite data
 pltopt = {'colour'         : lambda s: {'OC-G':'orange','OC-A':'r','OC-B':'indigo',

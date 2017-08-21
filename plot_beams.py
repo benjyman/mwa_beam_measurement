@@ -142,7 +142,12 @@ useable_sat_list=[]
 #sat_list=['OC-B2']
 
 ##########Try Jarryd's list from Sat_Data.csv #### USE this!
-sat_list=['OC-G2', 'OC-A1', 'OC-A2', 'OC-A3', 'OC-A4', 'OC-A5', 'OC-A6', 'OC-A7', 'OC-A8', 'OC-B1', 'OC-B2', 'OC-B3', 'OC-B4', 'OC-B6', 'OC-B7', 'OC-B8', 'OC-C1', 'OC-C3', 'OC-C7', 'OC-D2', 'OC-D3', 'OC-D4', 'OC-D6', 'OC-D7', 'OC-D8', 'OC-3K3', 'OC-4K4', 'OC-6K6', 'OC-7K7', 'OC-9K9', 'NOAA-15', 'NOAA-18', 'NOAA-19','METEOR']
+#sat_list=['OC-G2', 'OC-A1', 'OC-A2', 'OC-A3', 'OC-A4', 'OC-A5', 'OC-A6', 'OC-A7', 'OC-A8', 'OC-B1', 'OC-B2', 'OC-B3', 'OC-B4', 'OC-B6', 'OC-B7', 'OC-B8', 'OC-C1', 'OC-C3', 'OC-C7', 'OC-D2', 'OC-D3', 'OC-D4', 'OC-D6', 'OC-D7', 'OC-D8', 'OC-3K3', 'OC-4K4', 'OC-6K6', 'OC-7K7', 'OC-9K9', 'NOAA-15', 'NOAA-18', 'NOAA-19','METEOR']
+#include 11 new sats
+#sat_list=['OC-5T3','OC-8R2','OC-10T2','OC-12S3','OC-13S2','OC-14T4','OC-15R3','OC-16S1','OC-17R1','OC-18T1','OC-19S4']
+#all sats
+sat_list=['OC-G2', 'OC-A1', 'OC-A2', 'OC-A3', 'OC-A4', 'OC-A5', 'OC-A6', 'OC-A7', 'OC-A8', 'OC-B1', 'OC-B2', 'OC-B3', 'OC-B4', 'OC-B6', 'OC-B7', 'OC-B8', 'OC-C1', 'OC-C3', 'OC-C7', 'OC-D2', 'OC-D3', 'OC-D4', 'OC-D6', 'OC-D7', 'OC-D8', 'OC-3K3', 'OC-4K4', 'OC-6K6', 'OC-7K7', 'OC-9K9', 'NOAA-15', 'NOAA-18', 'NOAA-19','METEOR','OC-5T3','OC-8R2','OC-10T2','OC-12S3','OC-13S2','OC-14T4','OC-15R3','OC-16S1','OC-17R1','OC-18T1','OC-19S4']
+
 
 
 #sat_list=['OC-G2', 'OC-A1', 'OC-A2', 'OC-A3']
@@ -337,7 +342,7 @@ def generate_pb_map(AUT_tile_name_in,ref_tile_name_in,AUT_signal_threshold_in,re
          #powers=[]
          AUT_powers=[AUT_dat[1+chan][index] for chan in range(0,112)]
          ref_powers=[ref_dat[1+chan][ref_timestamp_index] for chan in range(0,112)]
-         #set bad chan(s) to zero
+         #set bad chan(s) to small power
          AUT_powers[bad_chan]=-110
          ref_powers[bad_chan]=-110
          AUT_powers[bad_chan+1]=-110
@@ -1196,17 +1201,21 @@ def plot_sat_prediction(sat_list,start_time_UT,end_time_UT):
       print "alt for sat %s is %s deg" % (sat_desig,alt)
       
 def plot_chan_histogram(AUT_tile_name,ref_tile_name):
-
+   sat_dictionaries_dict_filename='sat_dictionaries_dict_AUT_%s_ref_%s.npy' % (AUT_tile_name,ref_tile_name)
    read_dictionary = np.load(sat_dictionaries_dict_filename).item()
    for sat in sat_list:
          chans=np.array(read_dictionary[sat]['chan'])
          chans=chans[~np.isnan(chans)]
          if (np.isfinite(chans).any()):
             plt.hist(chans, bins=range(int(min(chans)), int(max(chans)) + 1, 1))
+            fig_name="histogram_sat_%s.png" % sat
             plt.title("Histogram of max power chans for sat %s" % sat)
             plt.xlabel("Chan Number")
             plt.ylabel("Frequency")
-            plt.show()
+            current_fig = plt.gcf()
+            current_fig.savefig(fig_name,dpi=200)
+            plt.clf()
+            #plt.show()
 
 def compare_pb_maps():
     
@@ -1354,8 +1363,8 @@ usage = 'Usage: plot_beams.py [options]'
 
 parser = OptionParser(usage=usage)
 
-parser.add_option('--generate_pb_map',action='store_true',dest='generate_pb_map',default=True,help='Generate the primary beam map from the RFExplorerdata and save map data [default=%default]')
-parser.add_option('--plot_pb_map',action='store_true',dest='plot_pb_map',default=True,help='Make and save the plots of the beam maps [default=%default]')
+parser.add_option('--generate_pb_map',action='store_true',dest='generate_pb_map',default=False,help='Generate the primary beam map from the RFExplorerdata and save map data [default=%default]')
+parser.add_option('--plot_pb_map',action='store_true',dest='plot_pb_map',default=False,help='Make and save the plots of the beam maps [default=%default]')
 parser.add_option('--plot_1D',action='store_true',dest='plot_1D',default=False,help='Make and save 1D plots of alt/power vs time [default=%default]')
 parser.add_option('--obs_start_time',type='string', dest='obs_start_time',default=None,help='Start time in gps seconds of the observations e.g. --obs_start_time="1501833532" [default=%default]')
 parser.add_option('--obs_end_time',type='string', dest='obs_end_time',default=None,help='Start time in gps seconds of the observations e.g. --obs_end_time="1501833542" [default=%default]')
@@ -1369,6 +1378,8 @@ parser.add_option('--AUT_signal_threshold',type='string', dest='AUT_signal_thres
 parser.add_option('--alt_threshold',type='string', dest='alt_threshold',default="30",help='Threshold altitiude for how high a sat must be for inclusion e.g. --alt_threshold="30" [default=%default]')
 parser.add_option('--converted_data_filename_base',type='string', dest='converted_data_filename_base',default="converted_all",help=' e.g. --converted_data_filename_base="Aug_2017_wed_all_good" [default=%default]')
 parser.add_option('--use_old_TLEs',action='store_true',dest='use_old_TLEs',default=False,help='**Not yet implemented** Do not check for more recent TLEs [default=%default]')
+parser.add_option('--plot_chan_histogram',action='store_true',dest='plot_chan_histogram',default=False,help='Plot the histogram of which channel has been allocated to each satellite [default=%default]')
+
 
 
 (options, args) = parser.parse_args()
@@ -1405,7 +1416,8 @@ for ref_ant in ref_tile_list:
          plot_pb_map(AUT,ref_ant)
       if (options.plot_1D):
          plot_1D(AUT,ref_ant)
-#      #plot_chan_histogram(AUT_tile_name,ref_tile_name)
+      if (options.plot_chan_histogram):
+         plot_chan_histogram(AUT,ref_ant)
 
 ##obsrange:(1448335711, 1448851982)
 ##obs_range_test =  (1448429025 , 1448447953)
